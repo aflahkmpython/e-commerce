@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #1a1a1a; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .logo { font-size: 24px; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; font-style: italic; }
+        .status-badge { display: inline-block; padding: 8px 16px; border-radius: 50px; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+        .pending { background-color: #fffbeb; color: #b45309; }
+        .confirmed { background-color: #eff6ff; color: #1d4ed8; }
+        .shipped { background-color: #faf5ff; color: #7e22ce; }
+        .delivered { background-color: #f0fdf4; color: #15803d; }
+        .cancelled { background-color: #fef2f2; color: #b91c1c; }
+        .footer { text-align: center; margin-top: 40px; color: #9ca3af; font-size: 12px; }
+        .button { display: inline-block; background-color: #111827; color: #ffffff !important; padding: 16px 32px; border-radius: 12px; text-decoration: none; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">ECOMMERCE STORE</div>
+        </div>
+        
+        <div style="background-color: #f9fafb; padding: 40px; border-radius: 24px; border: 1px solid #f3f4f6;">
+            <div class="status-badge {{ status }}">
+                Order {{ status_display }}
+            </div>
+            
+            <h1 style="margin: 0 0 16px 0; font-size: 28px; font-weight: 900; font-style: italic;">Your order status has been updated.</h1>
+            <p style="margin-bottom: 8px; font-weight: 700;">Order ID: #ORD-{{ order_id }}</p>
+            <p style="color: #4b5563; margin-bottom: 24px;">{{ status_description }}</p>
+            
+            {% if estimated_delivery %}
+            <div style="margin-bottom: 24px;">
+                <p style="margin: 0; font-size: 12px; color: #9ca3af; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">Estimated Delivery</p>
+                <p style="margin: 4px 0 0 0; font-weight: 700;">{{ estimated_delivery }}</p>
+            </div>
+            {% endif %}
+
+            <a href="{{ tracking_url }}" class="button">Track Your Order</a>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2026 Ecommerce Store. All rights reserved.</p>
+            <p>If you have any questions, reply to this email or visit our support page.</p>
+        </div>
+    </div>
+</body>
+</html>
