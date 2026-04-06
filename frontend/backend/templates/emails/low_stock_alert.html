@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #1a1a1a; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .logo { font-size: 24px; font-weight: 900; letter-spacing: -1px; text-transform: uppercase; font-style: italic; }
+        .alert-badge { display: inline-block; padding: 8px 16px; border-radius: 50px; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; background-color: #fef2f2; color: #b91c1c; border: 1px solid #fee2e2; }
+        .footer { text-align: center; margin-top: 40px; color: #9ca3af; font-size: 12px; }
+        .button { display: inline-block; background-color: #111827; color: #ffffff !important; padding: 16px 32px; border-radius: 12px; text-decoration: none; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; margin-top: 20px; }
+        .product-list { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .product-list th { text-align: left; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; padding: 12px; border-bottom: 1px solid #f3f4f6; }
+        .product-list td { padding: 16px 12px; border-bottom: 1px solid #f3f4f6; font-size: 13px; font-weight: 600; }
+        .stock-count { font-weight: 900; color: #b91c1c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">ECOMMERCE STORE</div>
+        </div>
+        
+        <div style="background-color: #ffffff; padding: 40px; border-radius: 24px; border: 1px solid #f3f4f6; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <div class="alert-badge italic">Inventory Alert</div>
+            
+            <h1 style="margin: 0 0 16px 0; font-size: 24px; font-weight: 900; font-style: italic; letter-spacing: -0.5px;">Attention: Critical Stock Levels</h1>
+            <p style="color: #4b5563; margin-bottom: 24px;">The following products have fallen below the stock threshold (10 units). Please review and restock to avoid order cancellations.</p>
+            
+            <table class="product-list">
+                <thead>
+                    <tr>
+                        <th>Product Specification</th>
+                        <th>Category</th>
+                        <th>Current Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.category.name }}</td>
+                        <td class="stock-count">{{ product.stock }} UNITS</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="{{ admin_url }}" class="button italic">Open Inventory Dashboard</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2026 Ecommerce Store. All rights reserved.</p>
+            <p>Automated Inventory Intelligence</p>
+        </div>
+    </div>
+</body>
+</html>
