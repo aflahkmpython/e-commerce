@@ -9,6 +9,7 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=120, unique=True, blank=True)
     description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='categories/', blank=True, null=True)
     parent = models.ForeignKey(
         'self', 
         on_delete=models.SET_NULL, 
@@ -49,10 +50,17 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     stock = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    cost_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Cost of goods (COGS) per unit. Used for profit margin calculations.")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField(Tag, blank=True, related_name='products')
+    rating = models.DecimalField(
+        max_digits=3, 
+        decimal_places=2, 
+        default=0.00,
+        validators=[MinValueValidator(0), MaxValueValidator(5)]
+    )
 
     class Meta:
         ordering = ['-created_at']
@@ -77,12 +85,6 @@ class InventoryAlert(models.Model):
 
     def __str__(self):
         return f"Alert for {self.product.name} at stock {self.stock_at_alert}"
-
-    @property
-    def current_price(self):
-        if self.discount_price:
-            return self.discount_price
-        return self.price
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
@@ -124,5 +126,13 @@ class Wishlist(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f"Wishlist for {self.user.email}"
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from django.db.models import Avg
+
+@receiver([post_save, post_delete], sender=Review)
+def update_product_rating(sender, instance, **kwargs):
+    product = instance.product
+    avg_rating = product.reviews.aggregate(Avg('rating'))['rating__avg']
+    product.rating = avg_rating or 0.00
+    product.save()

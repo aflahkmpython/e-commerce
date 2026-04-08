@@ -22,13 +22,13 @@ from django.http import JsonResponse
 from .views import health_check
 
 urlpatterns = [
-    path('', lambda r: JsonResponse({"status": "Backend Online", "api_root": "/api/health/", "frontend_port": 3000}), name='root'),
+    path('', lambda r: JsonResponse({"status": "Backend Online", "api_root": "/api/health/", "frontend_port": 5173}), name='root'),
     path('admin/', admin.site.urls),
     path('api/health/', health_check, name='health_check'),
     path('api/accounts/', include('accounts.urls')),
     path('api/', include('products.urls')),
     path('api/orders/', include('orders.urls')),
-    path('api/admin/site/', include('site_config.urls')),
+    path('api/site/', include('site_config.urls')),
     path('api/admin/', include('admin_api.urls')),
 ]
 

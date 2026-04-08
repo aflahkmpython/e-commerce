@@ -216,6 +216,42 @@ class AdminUserDetailSerializer(serializers.ModelSerializer):
         total = Order.objects.filter(user=obj, payment_status='paid').aggregate(Sum('total_amount'))['total_amount__sum']
         return total or 0
 
+# ─── Dashboard Serializers ────────────────────────────────────────────────────
+
+class DashboardOrderSerializer(serializers.ModelSerializer):
+    customer_name = serializers.CharField(source='user.full_name', read_only=True)
+    customer_email = serializers.EmailField(source='user.email', read_only=True)
+    item_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = [
+            'id', 'customer_name', 'customer_email',
+            'total_amount', 'status', 'payment_status',
+            'item_count', 'created_at',
+        ]
+
+    def get_item_count(self, obj):
+        return obj.items.count()
+
+
+class TopProductDashboardSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    product_name = serializers.CharField()
+    image = serializers.URLField(allow_null=True)
+    units_sold = serializers.IntegerField()
+    revenue = serializers.FloatField()
+    margin_pct = serializers.FloatField()
+
+
+class CustomerInsightSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    email = serializers.EmailField()
+    total_spent = serializers.FloatField()
+    order_count = serializers.IntegerField()
+
+
 from site_config.models import PromoCode, UserPromoUsage
 
 class AdminPromoCodeSerializer(serializers.ModelSerializer):

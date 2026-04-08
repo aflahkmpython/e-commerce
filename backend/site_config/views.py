@@ -1,12 +1,11 @@
-from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework import generics, viewsets, views, status, permissions
 from rest_framework.response import Response
-from rest_framework.decorators import action
-from .models import SiteConfig, Banner, FeaturedProduct, PromoSection
+from .models import SiteConfig, FeaturedProduct, HeroSlide
 from .serializers import (
-    SiteConfigSerializer, BannerSerializer, 
-    FeaturedProductSerializer, PromoSectionSerializer
+    SiteConfigSerializer, 
+    FeaturedProductSerializer, 
+    HeroSlideSerializer
 )
 
 class AdminSiteConfigView(generics.RetrieveUpdateAPIView):
@@ -19,24 +18,6 @@ class AdminSiteConfigView(generics.RetrieveUpdateAPIView):
         obj, created = SiteConfig.objects.get_or_create(id=1)
         return obj
 
-class AdminBannerViewSet(viewsets.ModelViewSet):
-    queryset = Banner.objects.all()
-    serializer_class = BannerSerializer
-    permission_classes = [permissions.IsAdminUser]
-
-    @action(detail=False, methods=['post'])
-    def reorder(self, request):
-        # Atomic reorder: updates multiple display_order fields in one transaction.
-        banner_ids = request.data.get('banner_ids', [])
-        if not banner_ids:
-            return Response({'error': 'banner_ids missing'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        with transaction.atomic():
-            for index, bid in enumerate(banner_ids):
-                Banner.objects.filter(id=bid).update(display_order=index)
-        
-        return Response({'status': 'Banners reordered'}, status=status.HTTP_200_OK)
-
 class AdminFeaturedProductView(generics.ListCreateAPIView):
     queryset = FeaturedProduct.objects.all()
     serializer_class = FeaturedProductSerializer
@@ -47,11 +28,6 @@ class AdminFeaturedProductDeleteView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAdminUser]
     lookup_field = 'id'
 
-class AdminPromoSectionViewSet(viewsets.ModelViewSet):
-    queryset = PromoSection.objects.all()
-    serializer_class = PromoSectionSerializer
-    permission_classes = [permissions.IsAdminUser]
-
 class PublicSiteConfigView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -59,14 +35,16 @@ class PublicSiteConfigView(views.APIView):
         obj, created = SiteConfig.objects.get_or_create(id=1)
         serializer = SiteConfigSerializer(obj)
         
-        # Banners and Featured Products included for app init
-        banners = Banner.objects.filter(is_active=True).order_by('display_order')[:5]
+        # Featured Products included for app init
         featured = FeaturedProduct.objects.all().order_by('display_order')[:8]
-        promos = PromoSection.objects.filter(is_active=True)
 
         return Response({
             'config': serializer.data,
-            'banners': BannerSerializer(banners, many=True).data,
             'featured': FeaturedProductSerializer(featured, many=True).data,
-            'promos': PromoSectionSerializer(promos, many=True).data
+            'hero_slides': HeroSlideSerializer(HeroSlide.objects.filter(is_active=True).order_by('order'), many=True).data
         })
+
+class HeroSlideViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = HeroSlide.objects.filter(is_active=True).order_by('order')
+    serializer_class = HeroSlideSerializer
+    permission_classes = [permissions.AllowAny]

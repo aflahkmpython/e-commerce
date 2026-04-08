@@ -6,7 +6,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug', 'description', 'parent', 'children']
+        fields = ['id', 'name', 'slug', 'description', 'image', 'parent', 'children']
 
     def get_children(self, obj):
         if obj.children.exists():
@@ -44,7 +44,6 @@ class ProductSerializer(serializers.ModelSerializer):
     primary_image = serializers.SerializerMethodField()
     reviews = ReviewSerializer(many=True, read_only=True)
     tags = TagSerializer(many=True, read_only=True)
-    average_rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -52,7 +51,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 'category', 'category_name', 'name', 'slug', 
             'description', 'price', 'discount_price', 'current_price',
             'stock', 'is_active', 'created_at', 'updated_at', 
-            'tags', 'images', 'primary_image', 'reviews', 'average_rating'
+            'tags', 'images', 'primary_image', 'reviews', 'rating'
         ]
 
     def get_primary_image(self, obj):

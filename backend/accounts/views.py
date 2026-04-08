@@ -39,14 +39,17 @@ class LoginView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         if response.status_code == status.HTTP_200_OK:
-            # Check if there is a guest cart to merge
+            # Merge guest cart if applicable
             session_key = request.session.session_key
-            if session_key:
-                # We need the user object. 
-                # Since LoginView doesn't return the user object directly, we fetch it.
-                email = request.data.get('email')
+            email = request.data.get('email')
+            try:
                 user = User.objects.get(email=email)
-                merge_guest_cart(user, session_key)
+                if session_key:
+                    merge_guest_cart(user, session_key)
+                # Attach user data to response
+                response.data['user'] = UserSerializer(user).data
+            except User.DoesNotExist:
+                pass
         return response
 
 class LogoutView(generics.GenericAPIView):
@@ -79,7 +82,7 @@ class PasswordResetRequestView(generics.GenericAPIView):
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             
             # In a real app, this would be a link to your frontend reset page
-            reset_url = f"http://localhost:3000/reset-password/{uid}/{token}/"
+            reset_url = f"http://localhost:5173/reset-password/{uid}/{token}/"
             
             send_mail(
                 'Password Reset Request',

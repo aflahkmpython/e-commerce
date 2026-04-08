@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SiteConfig, Banner, FeaturedProduct, PromoSection
+from .models import SiteConfig, FeaturedProduct, HeroSlide
 from products.models import Product
 import cloudinary.uploader
 
@@ -29,11 +29,6 @@ class SiteConfigSerializer(serializers.ModelSerializer):
 
         return super().update(instance, validated_data)
 
-class BannerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Banner
-        fields = '__all__'
-
 class FeaturedProductSerializer(serializers.ModelSerializer):
     product_name = serializers.ReadOnlyField(source='product.name')
     product_image = serializers.SerializerMethodField()
@@ -54,7 +49,7 @@ class FeaturedProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Storefront Capacity Reached: A maximum of 8 featured products is permitted to maintain homepage performance.")
         return data
 
-class PromoSectionSerializer(serializers.ModelSerializer):
+class HeroSlideSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PromoSection
-        fields = '__all__'
+        model = HeroSlide
+        fields = ['id', 'title', 'subtitle', 'button_text', 'button_link', 'image', 'is_active', 'order']

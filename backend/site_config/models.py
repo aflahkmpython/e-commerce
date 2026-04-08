@@ -27,22 +27,6 @@ class SiteConfig(models.Model):
             self.pk = existing.pk
         super().save(*args, **kwargs)
 
-class Banner(models.Model):
-    title = models.CharField(max_length=200)
-    subtitle = models.CharField(max_length=500, blank=True)
-    cta_text = models.CharField(max_length=50, default='Shop Now')
-    cta_link = models.CharField(max_length=200, default='/products')
-    image = models.ImageField(upload_to='banners/')
-    is_active = models.BooleanField(default=True)
-    display_order = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['display_order', '-created_at']
-
-    def __str__(self):
-        return self.title
-
 class FeaturedProduct(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='featured_info')
     display_order = models.PositiveIntegerField(default=0)
@@ -52,23 +36,6 @@ class FeaturedProduct(models.Model):
 
     def __str__(self):
         return f"Featured: {self.product.name}"
-
-class PromoSection(models.Model):
-    SECTION_TYPES = (
-        ('hero', 'Hero Banner'),
-        ('mid_page', 'Mid-Page Section'),
-        ('footer_banner', 'Footer Banner'),
-    )
-    heading = models.CharField(max_length=200)
-    subheading = models.TextField(blank=True)
-    image = models.ImageField(upload_to='promos/')
-    link = models.CharField(max_length=200, blank=True)
-    is_active = models.BooleanField(default=True)
-    section_type = models.CharField(max_length=20, choices=SECTION_TYPES)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.get_section_type_display()}: {self.heading}"
 
 class PromoCode(models.Model):
     DISCOUNT_TYPES = (
@@ -136,3 +103,19 @@ class UserPromoUsage(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.promo_code.code}"
+
+class HeroSlide(models.Model):
+    title = models.CharField(max_length=200)
+    subtitle = models.CharField(max_length=400, blank=True)
+    button_text = models.CharField(max_length=50, default='Explore Shop')
+    button_link = models.CharField(max_length=255, default='/products')
+    image = models.ImageField(upload_to='hero/')
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', '-created_at']
+
+    def __str__(self):
+        return self.title

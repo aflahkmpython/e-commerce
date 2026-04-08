@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, filters, pagination
+from rest_framework import viewsets, permissions, filters, pagination, status
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Category, Product, Tag, ProductImage, Review, Wishlist
 from .serializers import (
@@ -45,9 +45,10 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ViewSet for viewing categories in a recursive tree or individually.
     """
-    queryset = Category.objects.filter(parent=None)
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [permissions.AllowAny]
+    lookup_field = 'slug'
 
 class ProductViewSet(viewsets.ModelViewSet):
     """
